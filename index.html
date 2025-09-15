@@ -10,15 +10,22 @@
 
   <header class="header">
     <div class="header-item">
-      <h1><a href="index.html" style="text-decoration: none; color: inherit;"><span class="dinero">Mis 5€ 💶</span></a></h1>
+      <h1><a href="a.html" style="text-decoration: none; color: inherit;" data-translate="title">Color Palette Explorer</a></h1>
     </div>
     <div class="header-item header-item-center">
       <div class="search-container">
-        <input type="text" id="search-bar" placeholder="Search for a color...">
+        <input type="text" id="search-bar" placeholder="Search for a color..." data-translate-placeholder="searchPlaceholder">
       </div>
     </div>
     <div class="header-item">
-      <a href="#">About</a>
+      <div class="language-selector">
+        <select id="language-select">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+      <span class="mis-cinco-euros">Mis 5€ 💶</span>
+      <a href="#" data-translate="about">About</a>
     </div>
   </header>
 
@@ -29,9 +36,10 @@
   </main>
 
   <footer class="footer">
-    <p>&copy; 2025 Color Palette Explorer. All rights reserved.</p>
+    <p data-translate="copyright">&copy; 2025 Color Palette Explorer. All rights reserved.</p>
   </footer>
 
+  <script src="translations.js"></script>
   <script>
     const colors = {
       "indianred": { "hex": "CD5C5C", "rgb": "205, 92, 92", "hsl": "0, 53, 58" },
@@ -180,25 +188,30 @@
     document.addEventListener('DOMContentLoaded', function() {
       const grid = document.querySelector('.color-grid');
       const searchBar = document.getElementById('search-bar');
+      const languageSelect = document.getElementById('language-select');
 
       function renderGrid(filter = '') {
+        const selectedLanguage = languageSelect.value;
         let cards = '';
         for (const name in colors) {
-          if (colors.hasOwnProperty(name) && name.toLowerCase().includes(filter.toLowerCase())) {
-              const color = colors[name];
-              cards += `
-                <li class="color-swatch-card">
-                  <a href="details.html?color=${name}">
-                    <div class="swatch-preview" style="background-color: ${name};"></div>
-                    <div class="swatch-info">
-                      <h2>${name}</h2>
-                      <p>HEX: #${color.hex}</p>
-                      <p>RGB: ${color.rgb}</p>
-                      <p>HSL: ${color.hsl}</p>
-                    </div>
-                  </a>
-                </li>
-              `;
+          if (colors.hasOwnProperty(name)) {
+              const translatedName = translations[selectedLanguage][name] || name;
+              if (translatedName.toLowerCase().includes(filter.toLowerCase())) {
+                  const color = colors[name];
+                  cards += `
+                    <li class="color-swatch-card">
+                      <a href="details.html?color=${name}">
+                        <div class="swatch-preview" style="background-color: ${name};"></div>
+                        <div class="swatch-info">
+                          <h2 data-translate="${name}">${translatedName}</h2>
+                          <p>HEX: #${color.hex}</p>
+                          <p>RGB: ${color.rgb}</p>
+                          <p>HSL: ${color.hsl}</p>
+                        </div>
+                      </a>
+                    </li>
+                  `;
+              }
           }
         }
         grid.innerHTML = cards;
@@ -210,6 +223,20 @@
       // Search functionality
       searchBar.addEventListener('input', (e) => {
         renderGrid(e.target.value);
+      });
+
+      // Language change
+      languageSelect.addEventListener('change', (event) => {
+        const selectedLanguage = event.target.value;
+        document.querySelectorAll('[data-translate]').forEach(element => {
+          const key = element.dataset.translate;
+          element.textContent = translations[selectedLanguage][key];
+        });
+        document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+            const key = element.dataset.translatePlaceholder;
+            element.placeholder = translations[selectedLanguage][key];
+        });
+        renderGrid(searchBar.value);
       });
     });
   </script>
