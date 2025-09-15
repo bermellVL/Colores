@@ -211,3 +211,9 @@ code {
     border: 1px solid #dee2e6;
     box-sizing: border-box;
 }
+
+.dinero {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+}
